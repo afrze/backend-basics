@@ -95,3 +95,57 @@ migrate -path db/migration -database "postgresql://root:secret@localhost:5432/si
     
 migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
 ```
+## SQLC
+
+Alternate way of handling Database operations
+
+- To initialize `sqlc init` - This generates a `sqlc.yaml` file
+- Settings for `sqlc.yaml` 
+    
+```yaml
+  version: "2"
+  sql:
+    - engine: "postgresql"
+      queries: "./db/query"
+      schema: "./db/migration"
+      gen:
+        go:
+          package: "db"
+          out: "./db/sqlc"
+          sql_package: "pgx/v5"
+```
+    
+- Refer this documentation: [SQLC Documentation](https://docs.sqlc.dev/en/latest/tutorials/getting-started-postgresql.html#setting-up)
+- Example query for `sqlc` 
+    
+```sql
+  -- name: CreateAccount :one
+  INSERT INTO accounts (
+    owner,
+    balance,
+    currency
+  ) VALUES (
+    $1, $2, $3
+  ) RETURNING *;
+    
+  -- name: GetAccount :one
+  SELECT * FROM accounts 
+  WHERE id = $1 LIMIT 1;
+    
+  -- name: ListAccounts :many
+  SELECT * FROM accounts
+  ORDER BY id 
+  LIMIT $1
+  OFFSET $2;
+    
+  -- name: UpdateAccount :one
+  UPDATE accounts
+  SET balance = $2
+  WHERE id = $1
+  RETURNING *;
+    
+  -- name: DeleteAccount :exec
+  DELETE FROM accounts
+  WHERE id = $1;
+```
+- To generate files `sqlc generate`

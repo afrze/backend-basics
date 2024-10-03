@@ -2,9 +2,15 @@
     "cSpell.words": [
         "createdb",
         "databse",
+        "DBTX",
+        "jackc",
+        "pgconn",
+        "pgtype",
         "psql",
         "quickview",
+        "sqlc",
         "sslmode",
+        "Timestamptz",
         "Udemy"
     ]
 }
