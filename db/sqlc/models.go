@@ -2,35 +2,36 @@
 // versions:
 //   sqlc v1.27.0
 
-package repo
+package db
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
+	"database/sql"
+	"time"
 )
 
 type Account struct {
-	ID        int64
-	Owner     string
-	Balance   int64
-	Currency  string
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	ID        int64        `json:"id"`
+	Owner     string       `json:"owner"`
+	Balance   int64        `json:"balance"`
+	Currency  string       `json:"currency"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
 }
 
 type Entry struct {
-	ID        int64
-	AccountID int64
+	ID        int64 `json:"id"`
+	AccountID int64 `json:"account_id"`
 	// note: can be positive or negative
-	Amount    int64
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	Amount    int64        `json:"amount"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
 }
 
 type Transfer struct {
-	ID            int64
-	FromAccountID int64
-	ToAccountID   int64
-	Amount        int64
-	CreatedAt     pgtype.Timestamptz
-	UpdatedAt     pgtype.Timestamptz
+	ID            int64        `json:"id"`
+	FromAccountID int64        `json:"from_account_id"`
+	ToAccountID   int64        `json:"to_account_id"`
+	Amount        int64        `json:"amount"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     sql.NullTime `json:"updated_at"`
 }
