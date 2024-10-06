@@ -16,4 +16,7 @@ down:
 sqlc:
 	sqlc generate
 
-.PHONY: sqlc up down postgres createdb dropdb
+test:
+	go test -v -cover ./...
+
+.PHONY: test sqlc up down postgres createdb dropdb
