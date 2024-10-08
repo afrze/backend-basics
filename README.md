@@ -33,7 +33,7 @@ docker scout quickview <image-name>:<tag-name>
 
 ```bash
 docker exec -it <container_name_or_id> <command> [args]
-```  
+```
 
 - View container logs `docker logs <container_name_or_id>`
 - To stop a container `docker stop <container_name>`
@@ -68,7 +68,7 @@ docker exec -it postgres createdb --username=root --owner=root simple_bank
 
 ```bash
 docker exec -it <container_name> psql -U <user_name> <database_name>
-        
+
 docker exec -it postgres psql -U root simple_bank
 ```
 
@@ -92,32 +92,33 @@ migrate create -ext sql -dir db/migration -seq init_schema
 
 ```bash
 migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
-    
+
 migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
 ```
+
 ## SQLC
 
 Alternate way of handling Database operations
 
 - To initialize `sqlc init` - This generates a `sqlc.yaml` file
-- Settings for `sqlc.yaml` 
-    
+- Settings for `sqlc.yaml`
+
 ```yaml
-  version: "2"
-  sql:
-    - engine: "postgresql"
-      queries: "./db/query"
-      schema: "./db/migration"
-      gen:
-        go:
-          package: "db"
-          out: "./db/sqlc"
-          sql_package: "pgx/v5"
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./db/query"
+    schema: "./db/migration"
+    gen:
+      go:
+        package: "db"
+        out: "./db/sqlc"
+        sql_package: "pgx/v5"
 ```
-    
+
 - Refer this documentation: [SQLC Documentation](https://docs.sqlc.dev/en/latest/tutorials/getting-started-postgresql.html#setting-up)
-- Example query for `sqlc` 
-    
+- Example query for `sqlc`
+
 ```sql
   -- name: CreateAccount :one
   INSERT INTO accounts (
@@ -127,25 +128,74 @@ Alternate way of handling Database operations
   ) VALUES (
     $1, $2, $3
   ) RETURNING *;
-    
+
   -- name: GetAccount :one
-  SELECT * FROM accounts 
+  SELECT * FROM accounts
   WHERE id = $1 LIMIT 1;
-    
+
   -- name: ListAccounts :many
   SELECT * FROM accounts
-  ORDER BY id 
+  ORDER BY id
   LIMIT $1
   OFFSET $2;
-    
+
   -- name: UpdateAccount :one
   UPDATE accounts
   SET balance = $2
   WHERE id = $1
   RETURNING *;
-    
+
   -- name: DeleteAccount :exec
   DELETE FROM accounts
   WHERE id = $1;
 ```
+
 - To generate files `sqlc generate`
+
+- To check for Deadlocks
+
+```sql
+SELECT 
+  blocked_locks.pid AS blocked_pid, 
+  blocked_activity.usename  AS blocked_user,         
+  blocking_locks.pid AS blocking_pid,         
+  blocking_activity.usename AS blocking_user, 
+  blocked_activity.query AS blocked_statement, 
+  blocking_activity.query AS current_statement_in_blocking_process 
+  FROM 
+  pg_catalog.pg_locks 
+  blocked_locks 
+  JOIN 
+  pg_catalog.pg_stat_activity blocked_activity 
+  ON 
+  blocked_activity.pid = blocked_locks.pid 
+  JOIN pg_catalog.pg_locks 
+  blocking_locks 
+  ON blocking_locks.locktype = blocked_locks.locktype 
+  AND blocking_locks.database IS NOT DISTINCT FROM blocked_locks.database 
+  AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation 
+  AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page 
+  AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple 
+  AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid 
+  AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid 
+  AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid 
+  AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid 
+  AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid 
+  AND blocking_locks.pid != blocked_locks.pid JOIN pg_catalog.pg_stat_activity blocking_activity 
+  ON blocking_activity.pid = blocking_locks.pid WHERE NOT blocked_locks.granted;
+```
+
+```sql
+SELECT 
+  a.datname, 
+  l.relation::regclass, 
+  l.transactionid, 
+  l.mode, 
+  l.GRANTED, 
+  a.usename, 
+  a.query, 
+  a.query_start, 
+  age(now(), a.query_start) AS "age", 
+  a.pidFROM pg_stat_activity aJOIN pg_locks l 
+  ON l.pid = a.pidORDER BY a.query_start;
+```

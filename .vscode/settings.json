@@ -2,16 +2,24 @@
     "cSpell.words": [
         "createdb",
         "databse",
+        "datname",
         "DBTX",
         "jackc",
+        "locktype",
+        "objid",
+        "objsubid",
         "pgconn",
         "pgtype",
         "psql",
         "quickview",
+        "regclass",
         "sqlc",
         "sslmode",
         "stretchr",
         "Timestamptz",
-        "Udemy"
+        "transactionid",
+        "Udemy",
+        "usename",
+        "virtualxid"
     ]
 }
