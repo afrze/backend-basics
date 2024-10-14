@@ -4,6 +4,7 @@
         "databse",
         "datname",
         "DBTX",
+        "isready",
         "jackc",
         "locktype",
         "objid",

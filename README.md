@@ -152,6 +152,8 @@ sql:
 
 - To generate files `sqlc generate`
 
+## Postgresql queries
+
 - To check for Deadlocks
 
 ```sql
@@ -199,3 +201,13 @@ SELECT
   a.pidFROM pg_stat_activity aJOIN pg_locks l 
   ON l.pid = a.pidORDER BY a.query_start;
 ```
+
+```sql
+# To see current transaction isolation level
+SHOW TRANSACTION ISOLATION LEVEL
+
+# To change transaction isolation level
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+```
+
+In PostgreSQL, Transaction isolation can be set inside a transaction. i.e, after `begin` statement
