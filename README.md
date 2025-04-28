@@ -1,2 +1,5 @@
-# backend-basics
-This repository contains basics of Golang, Postgres, Redis, Gin, gRPC, Docker, Kubernetes, AWS, CI/CD
+# Backend Basics
+
+Concepts documented here of Golang, Sqlc, Postgres, Redis, Gin, gRPC, Docker, Kubernetes, AWS, CI/CD.
+
+## Branch Information
